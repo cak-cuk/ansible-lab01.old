@@ -1,0 +1,6 @@
+---
+- name: Setup ufw
+  ansible.builtin.import_playbook: playbook/service/firewall.yml
+
+- name: Setup nginx in voyager
+  ansible.builtin.import_playbook: playbook/fqdn/voyager-01.yml
