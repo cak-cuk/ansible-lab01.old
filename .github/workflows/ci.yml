@@ -1,0 +1,19 @@
+---
+name: CI
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+env:
+  PY_COLORS: '1'
+  ANSIBLE_FORCE_COLOR: '1'
+  HOST_KEY_CHECKING: false
+
+jobs:
+  test_run:
+    name: Ansible
+    runs-on: [ "vm-ssd" ]
+  steps:
+    - name: Ansible Hello
+      run: ansible -i inventory ping all

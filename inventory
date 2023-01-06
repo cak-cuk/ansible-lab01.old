@@ -1,0 +1,4 @@
+voyager-01 ansible_host=voyager-01.mahyuddin.web.id
+
+[nginx]
+voyager-01
