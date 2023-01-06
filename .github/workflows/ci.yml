@@ -14,6 +14,6 @@ jobs:
   test_run:
     name: Ansible
     runs-on: [ "vm-ssd" ]
-  steps:
-    - name: Ansible Hello
-      run: ansible -i inventory ping all
+    steps:
+      - name: Ansible Hello
+        run: ansible -i inventory ping all
