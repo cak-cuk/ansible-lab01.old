@@ -1,0 +1,34 @@
+---
+- name: Deploy common firewall
+  hosts: all
+  become: true
+  tasks:
+    - name: Install ufw
+      ansible.builtin.apt:
+        name: ufw
+        state: present
+    - name: Make sure output are allow by default
+      community.general.ufw:
+        state: enabled
+        direction: outgoing
+        policy: allow
+    - name: Make sure input are drop by default
+      community.general.ufw:
+        state: enabled
+        direction: incoming
+        policy: deny
+    - name: Allow SSH
+      community.general.ufw:
+        rule: allow
+        port: '22'
+        proto: tcp
+    - name: Allow http
+      community.general.ufw:
+        rule: allow
+        port: '80'
+        proto: tcp
+    - name: Allow https
+      community.general.ufw:
+        rule: allow
+        port: '443'
+        proto: tcp
