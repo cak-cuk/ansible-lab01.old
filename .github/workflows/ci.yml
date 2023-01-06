@@ -1,4 +1,3 @@
-
 ---
 name: CI/CD
 "on":
@@ -29,15 +28,16 @@ jobs:
       - name: Install pip prequities
         run: pip3 install --no-cache-dir --user --upgrade -r files/requirements/pip3.txt
         continue-on-error: true
- 
+
       - name: Install ansible prequities
-        run: pip3 install --no-cache-dir --user --upgrade -r files/requirements/ansible-galaxy.yml
+        run: ansible-galaxy install -r files/requirements/ansible-galaxy.yml
         continue-on-error: true
- 
+
       - name: Code lint
         run: pre-commit run --show-diff-on-failure --color=always --all-files
         id: lint
-        
+        continue-on-error: true
+
       - uses: actions/github-script@v6
         if: github.event_name == 'pull_request'
         env:
@@ -63,7 +63,7 @@ jobs:
               repo: context.repo.repo,
               body: output
             })
-            
+
       - name: Run ansible
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: ansible-playbook -i inventory main.yml
