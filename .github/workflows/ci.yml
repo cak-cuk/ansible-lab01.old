@@ -33,9 +33,14 @@ jobs:
         run: ansible-galaxy install -r files/requirements/ansible-galaxy.yml
         continue-on-error: true
 
-      - name: Code lint
+      - name: Code lint (Pre-Commit)
         run: pre-commit run --show-diff-on-failure --color=always --all-files
         id: lint
+        continue-on-error: true
+
+      - name: Code lint (Ansible-lint)
+        run:  ansible-lint --force-color -x 106 .
+        id: ansible_lint
         continue-on-error: true
 
       - uses: actions/github-script@v6
