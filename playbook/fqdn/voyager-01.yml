@@ -47,5 +47,9 @@
     - name: Configure NGINX
       ansible.builtin.include_role:
         name: nginxinc.nginx_config
-      vars_file:
-        - "../../host_vars/voyager-01.yml"
+      vars:
+        nginx_config_cleanup: true
+        nginx_config_cleanup_paths:
+          - directory:
+              - /etc/nginx/conf.d
+            recurse: true
