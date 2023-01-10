@@ -6,9 +6,7 @@
     - name: Install NGINX
       ansible.builtin.include_role:
         name: nginxinc.nginx
-      vars:
-        nginx_modules:
-          - njs
+
     - name: Getting status for include config directory for nginx
       ansible.builtin.stat:
         path: /etc/nginx/custom.d

@@ -19,8 +19,8 @@
         policy: deny
     - name: Allow SSH
       community.general.ufw:
-        rule: allow
-        port: '22'
+        rule: limit
+        port: ssh
         proto: tcp
     - name: Allow http
       community.general.ufw:
@@ -32,3 +32,14 @@
         rule: allow
         port: '443'
         proto: tcp
+    - name: Disable logging
+      community.general.ufw:
+        logging: off
+    - name: Allow all access from RFC1918 networks to this host
+      community.general.ufw:
+        rule: allow
+        src: '{{ item }}'
+      loop:
+        - 10.0.0.0/8
+        - 172.16.0.0/12
+        - 192.168.0.0/16
