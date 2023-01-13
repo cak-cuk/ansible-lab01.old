@@ -1,1 +1,61 @@
 ---
+php_webserver_daemon: "nginx"
+php_default_version_debian: "8.1"
+php_enable_php_fpm: true
+php_fpm_state: started
+php_fpm_enabled_on_boot: true
+php_fpm_pools:
+  - pool_name: www
+    pool_template: www.conf.j2
+    pool_listen: "127.0.0.1:9000"
+    pool_listen_allowed_clients: "127.0.0.1"
+    pool_pm: dynamic
+    pool_pm_max_children: 5
+    pool_pm_start_servers: 2
+    pool_pm_min_spare_servers: 1
+    pool_pm_max_spare_servers: 3
+    pool_pm_max_requests: 500
+php_use_managed_ini: true
+php_fpm_pool_user: "www-data"
+php_fpm_pool_group: "www-data"
+php_memory_limit: "256M"
+php_max_execution_time: "60"
+php_max_input_time: "60"
+php_max_input_vars: "1000"
+php_realpath_cache_size: "32K"
+php_file_uploads: "On"
+php_upload_max_filesize: "64M"
+php_max_file_uploads: "20"
+php_post_max_size: "32M"
+php_date_timezone: "Asia/Jakarta"
+php_allow_url_fopen: "On"
+php_sendmail_path: "/usr/sbin/sendmail -t -i"
+php_output_buffering: "4096"
+php_short_open_tag: false
+php_error_reporting: "E_ALL & ~E_DEPRECATED & ~E_STRICT"
+php_display_errors: "Off"
+php_display_startup_errors: "On"
+php_expose_php: "On"
+php_session_cookie_lifetime: 0
+php_session_gc_probability: 1
+php_session_gc_divisor: 1000
+php_session_gc_maxlifetime: 1440
+php_session_save_handler: files
+php_session_save_path: ''
+php_disable_functions: []
+php_precision: 14
+php_serialize_precision: "-1"
+php_packages:
+  - php8.1-common
+  - php8.1-cli
+  - php8.1-dev
+  - php8.1-fpm
+  - php8.1-gd
+  - php8.1-curl
+  - php8.1-imap
+  - php8.1-opcache
+  - php8.1-xml
+  - php8.1-mbstring
+  - php8.1-apcu
+  - php8.1-sqlite3
+  - libpcre3-dev
