@@ -39,7 +39,7 @@ jobs:
         continue-on-error: true
 
       - name: Code lint (Ansible-lint)
-        run:  ansible-lint --force-color -x 106 .
+        run:  ansible-lint --force-color -x 106 -vvv .
         id: ansible_lint
         continue-on-error: true
 
@@ -50,11 +50,14 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `#### Ansible Lint outcome ������\`${{ steps.plant.outcome }}\`
+            const output = `
+            #### Pre-Commit outcome ������\`${{ steps.lint.outcome }}\`
+            #### Ansible lint outcome ������\`${{ steps.ansible_lint.outcome }}\`
 
-            <details><summary>Show Lint</summary>
+            <details><summary>Show pre-commit lint</summary>
 
             \`\`\`\n
+            ${steps.lint.outcome}
             ${process.env.LINT}
             \`\`\`
 

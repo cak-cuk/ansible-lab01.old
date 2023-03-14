@@ -87,6 +87,29 @@ nginx_config_status_port: 8080
 nginx_config_status_access_log:
   path: /var/log/nginx/access.log
 
+nginx_config_stream_template_enable: true
+nginx_config_stream_template:
+  - template_file: stream/default.conf.j2
+    deployment_location: /etc/nginx/conf.d/streams/dot.conf
+    config:
+      upstreams:
+        - name: dns
+          zone:
+            name: dns
+            size: 64k
+          servers:
+            - address: 127.0.0.1:53
+      servers:
+        - core:
+            listen:
+              - address: 0.0.0.0
+                port: 853
+                ssl: true
+          proxy:
+            pass: dns
+          ssl:
+            certificate: /etc/letsencrypt/live/mahyuddin.web.id/fullchain.pem
+            certificate_key: /etc/letsencrypt/live/mahyuddin.web.id/privkey.pem
 nginx_config_http_template_enable: true
 nginx_config_http_template:
   - template_file: http/default.conf.j2
@@ -250,6 +273,13 @@ nginx_config_http_template:
           least_conn: false
           servers:
             - address: 127.0.0.1:8953
+        - name: pihole_upstream
+          keepalive: 32
+          least_conn: false
+          servers:
+            - address: 127.0.0.1:8081
+      custom_directives:
+        - "include /etc/nginx/mime.types;"
 
   - template_file: http/default.conf.j2
     deployment_location: /etc/nginx/sites-enabled/default.conf
@@ -273,16 +303,20 @@ nginx_config_http_template:
               - voyager-01.mahyuddin.web.id
               - www.mahyuddin.web.id
               - mahyuddin.web.id
+              - "_"
+            root: /var/www/html
+            autoindex: off
+            index: index.html index.htm
           log:
             access:
               - path: /var/log/nginx/default-access.log
             error:
               - file: /var/log/nginx/default-error.log
           locations:
-            - location: /
-              core:
-                root: /usr/share/nginx/html
-                index: index.html
+           - location: /
+             core:
+               root: /usr/share/nginx/html
+               index: index.html
           ssl:
             certificate: /etc/letsencrypt/live/mahyuddin.web.id/fullchain.pem
             certificate_key: /etc/letsencrypt/live/mahyuddin.web.id/privkey.pem
@@ -295,6 +329,7 @@ nginx_config_http_template:
           custom_directives:
             - "add_header Strict-Transport-Security max-age=31536000;"
             - "include /etc/nginx/custom.d/cf-allow-ips.conf;"
+            - "include /etc/nginx/custom.d/locations.conf;"
         - core:
             aio:
               threads: default
@@ -308,6 +343,7 @@ nginx_config_http_template:
               - voyager-01.mahyuddin.web.id
               - www.mahyuddin.web.id
               - mahyuddin.web.id
+              - "-"
           log:
             access:
               - path: /var/log/nginx/default-access.log
@@ -325,6 +361,7 @@ nginx_config_http_template:
           custom_directives:
             - "add_header Strict-Transport-Security max-age=31536000;"
             - "include /etc/nginx/custom.d/cf-allow-ips.conf;"
+            - "include /etc/nginx/custom.d/locations.conf;"
 
   - template_file: http/default.conf.j2
     deployment_location: /etc/nginx/sites-enabled/loadbalancer.conf
@@ -363,29 +400,65 @@ nginx_config_http_template:
             ciphers: "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384"
           custom_directives:
             - "add_header Strict-Transport-Security max-age=31536000;"
+            - "include /etc/nginx/custom.d/cf-allow-ips.conf;"
+            - "include /etc/nginx/custom.d/locations.conf;"
+  - template_file: http/default.conf.j2
+    deployment_location: /etc/nginx/sites-enabled/pihole.conf
+    backup: false
+    config:
+      servers:
         - core:
             aio:
               threads: default
             keepalive_timeout: 75s
             listen:
-              - port: 80
-            open_file_cache: false
+              - port: 443
+                ssl: true
+              - port: "[::]:443"
+                ssl: true
             server_name:
-              - lb-02.mahyuddin.web.id
+              - pihole.mahyuddin.web.id
+            root: /var/www/html
+            autoindex: off
+            index: pihole/index.php index.php index.html index.htm
           log:
             access:
-              - path: /var/log/nginx/loadbalancer-access.log
+              - path: /var/log/nginx/pihole-access.log
             error:
-              - file: /var/log/nginx/loadbalancer-error.log
+              - file: /var/log/nginx/pihole-error.log
           locations:
             - location: /
               core:
-                root: /usr/share/nginx/html
-                index: index.html
-          rewrite:
-            return:
-              code: 301
-              url: 'https://$host$request_uri'
+              custom_directives:
+                - "expires max;"
+                - "try_files $uri $uri/ =404;"
+
+            - location: ~ \.php$
+              custom_directives:
+                - "include fastcgi_params;"
+                - "fastcgi_param SCRIPT_FILENAME $document_root/$fastcgi_script_name;"
+                - "fastcgi_pass unix:/run/php/php8.1-fpm.sock;"
+                - "fastcgi_param FQDN true;"
+                - "include /etc/nginx/custom.d/cf-allow-ips.conf;"
+            - location: /*.js
+              custom_directives:
+                - "index pihole/index.js;"
+                - "include /etc/nginx/custom.d/cf-allow-ips.conf;"
+            - location: /admin
+              core:
+                root: /var/www/html
+              custom_directives:
+                - "index index.php index.html index.htm;"
+                - "include /etc/nginx/custom.d/cf-allow-ips.conf;"
+          ssl:
+            certificate: /etc/letsencrypt/live/mahyuddin.web.id/fullchain.pem
+            certificate_key: /etc/letsencrypt/live/mahyuddin.web.id/privkey.pem
+            session_tickets: false
+            protocols:
+              - TLSv1.2
+              - TLSv1.3
+            dhparam: "/etc/ssl/dhparams.pem"
+            ciphers: "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384"
           custom_directives:
             - "add_header Strict-Transport-Security max-age=31536000;"
             - "include /etc/nginx/custom.d/cf-allow-ips.conf;"

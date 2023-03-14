@@ -4,5 +4,7 @@ roles:
     source: https://galaxy.ansible.com
   - name: nginxinc.nginx_config
     source: https://galaxy.ansible.com
+  - name: geerlingguy.php
+    source: https://galaxy.ansible.com
 collections:
   - name: nginxinc.nginx_core

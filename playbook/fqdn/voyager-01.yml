@@ -7,13 +7,12 @@
       ansible.builtin.include_role:
         name: nginxinc.nginx
 
-    - name: Getting status for include config directory for nginx
+    - name: Getting status for custom config directory for nginx
       ansible.builtin.stat:
         path: /etc/nginx/custom.d
       register: customconfigdir
-      notify: (Handler) Restart NGINX
 
-    - name: Create directory
+    - name: Create custom directory
       ansible.builtin.file:
         path: /etc/nginx/custom.d
         state: directory
@@ -21,6 +20,20 @@
         owner: root
         group: root
       when: not customconfigdir.stat.exists
+
+    - name: Getting status for streams directory for nginx
+      ansible.builtin.stat:
+        path: /etc/nginx/conf.d/streams
+      register: streamsconfigdir
+
+    - name: Create custom directory
+      ansible.builtin.file:
+        path: /etc/nginx/conf.d/streams
+        state: directory
+        mode: '0755'
+        owner: root
+        group: root
+      when: not streamsconfigdir.stat.exists
 
     - name: Download list Cloudflare allow lisi
       ansible.builtin.get_url:
@@ -42,12 +55,18 @@
         group: root
         mode: '0644'
 
+    - name: Copy common nginx config files
+      ansible.builtin.copy:
+        src: ../../files/nginx/common/locations.conf
+        dest: /etc/nginx/custom.d/locations.conf
+        owner: root
+        group: root
+        mode: '0644'
+
     - name: Configure NGINX
       ansible.builtin.include_role:
         name: nginxinc.nginx_config
-      vars:
-        nginx_config_cleanup: true
-        nginx_config_cleanup_paths:
-          - directory:
-              - /etc/nginx/conf.d
-            recurse: true
+
+    - name: Install PHP
+      ansible.builtin.include_role:
+        name: geerlingguy.php

@@ -7,6 +7,8 @@
       ansible.builtin.apt:
         name: ufw
         state: present
+    - name: Reset firewall fules
+      ansible.builtin.shell: ufw --force reset
     - name: Make sure output are allow by default
       community.general.ufw:
         state: enabled
@@ -25,13 +27,21 @@
     - name: Allow http
       community.general.ufw:
         rule: allow
-        port: '80'
-        proto: tcp
+        port: http
     - name: Allow https
       community.general.ufw:
         rule: allow
-        port: '443'
+        port: https
+    - name: Allow domain-s tcp
+      community.general.ufw:
+        rule: allow
+        port: domain-s
         proto: tcp
+    - name: Allow domain-s udp
+      community.general.ufw:
+        rule: allow
+        port: domain-s
+        proto: udp
     - name: Disable logging
       community.general.ufw:
         logging: off
