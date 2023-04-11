@@ -1,0 +1,35 @@
+---
+- name: Update and upgrade apt
+  become: true
+  ansible.builtin.apt:
+    update_cache: true
+    upgrade: safe
+    cache_valid_time: 86400
+    autoremove: true
+    autoclean: true
+  when: ansible_os_family == 'Debian'
+
+- name: Upgrade all yum packages exclude kernel*
+  become: true
+  ansible.builtin.yum:
+    name: '*'
+    state: latest
+  when: ansible_os_family == 'RedHat'
+
+- name: Install apt packages
+  ansible.builtin.apt:
+    pkg: "{{ item }}"
+    state: present
+    install_recommends: false
+  become: true
+  with_items:
+    - "{{ apt_packages }}"
+
+- name: Install yum packages
+  ansible.builtin.yum:
+    pkg: "{{ item }}"
+    state: present
+    install_recommends: false
+  become: true
+  with_items:
+    - "{{ yum_packages }}"

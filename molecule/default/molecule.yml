@@ -1,0 +1,66 @@
+---
+
+dependency:
+  name: galaxy
+  options:
+    ignore-certs: True
+    ignore-errors: False
+    requirements-file: ../../requirements/galaxy.yaml
+
+driver:
+  name: docker
+
+lint: |
+  set -e
+  yamllint .
+  ansible-lint -x 106 .
+
+platforms:
+  - name: centos7
+    hostname: centos7
+    tty: true
+    image: udienz/docker-ansible:centos7
+    command: "/usr/sbin/init"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    privileged: true
+    pre_build_image: true
+    environment:
+      container: docker
+    tmpfs:
+      - /run
+      - /tmp
+    capabilities:
+      - SYS_ADMIN
+
+  - name: ubuntu2204
+    hostname: ubuntu2204
+    tty: true
+    image: geerlingguy/docker-ansible:ubuntu2204
+    command: "/usr/sbin/init"
+    tmpfs:
+      - /run
+      - /tmp
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    privileged: true
+    pre_build_image: true
+    environment:
+      container: docker
+    capabilities:
+      - SYS_ADMIN
+
+provisioner:
+  name: ansible
+  log: true
+  options:
+    vvv: true
+  playbooks:
+    converge: ../../playbook.yaml
+  inventory:
+    links:
+      group_vars: ../../group_vars/
+      host_vars: ../../host_vars/
+
+verifier:
+  name: ansible

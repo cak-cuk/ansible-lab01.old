@@ -15,7 +15,7 @@ env:
 jobs:
   test_run:
     name: Ansible
-    runs-on: [ "vm-ssd" ]
+    runs-on: ubuntu-latest
     steps:
       - name: Check out the codebase.
         uses: actions/checkout@v3
@@ -30,7 +30,7 @@ jobs:
         continue-on-error: true
 
       - name: Install ansible prequities
-        run: ansible-galaxy install -r files/requirements/ansible-galaxy.yml
+        run: ansible-galaxy install -r files/requirements/galaxy.yml
         continue-on-error: true
 
       - name: Code lint (Pre-Commit)
@@ -69,6 +69,7 @@ jobs:
               body: output
             })
 
-      - name: Run ansible
+      - name: Run molecule
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: ansible-playbook -i inventory main.yml
+        run: |
+          molecule converge

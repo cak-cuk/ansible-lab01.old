@@ -1,0 +1,12 @@
+---
+apt_packages:
+  - vim
+  - htop
+  - iftop
+  - whois
+  - byobu
+
+yum_packages:
+  - vim-enhanced
+  - iftop
+  - htop
