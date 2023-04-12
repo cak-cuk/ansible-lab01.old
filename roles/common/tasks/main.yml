@@ -2,3 +2,5 @@
 # tasks file for roles/common
 - name: Package tasks
   ansible.builtin.include_tasks: packages.yaml
+- name: User tasks
+  ansible.builtin.include_tasks: users.yaml

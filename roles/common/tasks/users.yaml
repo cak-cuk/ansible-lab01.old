@@ -1,0 +1,27 @@
+---
+
+- name: "creating user"
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    shell: "{{ item.shell }}"
+    home: "/home/{{ item.name }}"
+    password: "{{ item.password }}"
+    expires: "-1"
+  loop: "{{ user_list }}"
+
+- name: Check sudoers
+  ansible.builtin.stat:
+    path: "/etc/sudoers.d/{{ item.name }}"
+  loop: "{{ user_list }}"
+  register: sudoerfile
+
+- name: Add user to sudoers
+  ansible.builtin.lineinfile:
+    path: '/etc/sudoers.d/{{ item.name }}'
+    line: '{{ item.name }} ALL = NOPASSWD: ALL'
+    state: present
+    mode: 0400
+    create: true
+    validate: 'visudo -cf %s'
+  loop: "{{ user_list }}"
+#  when: not sudoerfile.stat.exists

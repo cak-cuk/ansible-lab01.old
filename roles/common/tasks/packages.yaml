@@ -22,6 +22,7 @@
     state: present
     install_recommends: false
   become: true
+  when: ansible_os_family == 'Debian'
   with_items:
     - "{{ apt_packages }}"
 
@@ -29,7 +30,7 @@
   ansible.builtin.yum:
     pkg: "{{ item }}"
     state: present
-    install_recommends: false
   become: true
+  when: ansible_os_family == 'RedHat'
   with_items:
     - "{{ yum_packages }}"
