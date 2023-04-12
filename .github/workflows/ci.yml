@@ -33,18 +33,12 @@ jobs:
         run: ansible-galaxy install -r requirements/galaxy.yaml
         continue-on-error: true
 
-      - name: Code lint (Pre-Commit)
-        run: pre-commit run --show-diff-on-failure --color=always --all-files
-        id: lint
-        continue-on-error: true
-
       - name: Code lint (Ansible-lint)
         run:  ansible-lint --force-color -x 106 .
         id: ansible_lint
         continue-on-error: true
 
       - name: Run molecule
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         id: molecule_converge
         run: |
           molecule converge
