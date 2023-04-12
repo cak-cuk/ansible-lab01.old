@@ -2,5 +2,17 @@
 # tasks file for roles/common
 - name: Package tasks
   ansible.builtin.include_tasks: packages.yaml
+
 - name: User tasks
   ansible.builtin.include_tasks: users.yaml
+
+- name: change editor to vim
+  community.general.alternatives:
+    name: editor
+    path: /usr/bin/vim.basic
+  when: ansible_os_family == 'Debian'
+
+- name: Update timezone
+  ansible.builtin.timezone:
+    name: Asia/Jakarta 
+

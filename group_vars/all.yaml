@@ -5,6 +5,7 @@ apt_packages:
   - iftop
   - whois
   - byobu
+  - tzdata
 
 yum_packages:
   - vim-enhanced
@@ -20,3 +21,5 @@ user_list:
     shell: /bin/bash
     comment: Centos default user
     password: '*'
+
+timezone: 'Asia/Jakarta'
