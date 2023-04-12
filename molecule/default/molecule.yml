@@ -53,7 +53,7 @@ provisioner:
   name: ansible
   log: true
   env:
-    ANSIBLE_VAULT_PASSWORD_FILE: "${MOLECULE_SCENARIO_DIRECTORY}/.vault_pass" 
+    ANSIBLE_VAULT_PASSWORD_FILE: "${MOLECULE_SCENARIO_DIRECTORY}/.vault_pass"
       #vault_password_file: "${HOME}/.vault_pass"
         #vault_password_file: "${MOLECULE_SCENARIO_DIRECTORY}/.vault_pass"
   playbooks:
