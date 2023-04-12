@@ -14,5 +14,4 @@
 
 - name: Update timezone
   ansible.builtin.timezone:
-    name: Asia/Jakarta 
-
+    name: Asia/Jakarta
