@@ -26,7 +26,7 @@ jobs:
           python-version: '3.x'
 
       - name: Install pip prequities
-        run: pip3 install --no-cache-dir --user --upgrade -r requirements/pip3.txt
+        run: pip3 install --no-cache-dir --user --upgrade -r requirements/pip3.yaml
         continue-on-error: true
 
       - name: Install ansible prequities
