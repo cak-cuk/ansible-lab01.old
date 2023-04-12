@@ -43,16 +43,22 @@ jobs:
         id: ansible_lint
         continue-on-error: true
 
+      - name: Run molecule
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        id: molecule_converge
+        run: |
+          molecule converge
+
       - uses: actions/github-script@v6
         if: github.event_name == 'pull_request'
         env:
-          LINT: "ansible-lint\n${{ steps.lint.outputs.stdout }}"
+          LINT: "molecule converge\n${{ steps.molecule_converge.outputs.stdout }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const output = `#### Ansible Lint outcome ������\`${{ steps.plant.outcome }}\`
 
-            <details><summary>Show Lint</summary>
+            <details><summary>Show Converge</summary>
 
             \`\`\`\n
             ${process.env.LINT}
@@ -69,7 +75,4 @@ jobs:
               body: output
             })
 
-      - name: Run molecule
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          molecule converge
+
