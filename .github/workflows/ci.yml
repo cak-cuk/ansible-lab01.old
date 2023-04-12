@@ -26,11 +26,11 @@ jobs:
           python-version: '3.x'
 
       - name: Install pip prequities
-        run: pip3 install --no-cache-dir --user --upgrade -r files/requirements/pip3.txt
+        run: pip3 install --no-cache-dir --user --upgrade -r requirements/pip3.txt
         continue-on-error: true
 
       - name: Install ansible prequities
-        run: ansible-galaxy install -r files/requirements/galaxy.yml
+        run: ansible-galaxy install -r requirements/galaxy.yaml
         continue-on-error: true
 
       - name: Code lint (Pre-Commit)
