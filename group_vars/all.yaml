@@ -5,8 +5,21 @@ apt_packages:
   - iftop
   - whois
   - byobu
+  - tzdata
 
 yum_packages:
   - vim-enhanced
   - iftop
   - htop
+
+user_list:
+  - name: ubuntu
+    shell: /bin/bash
+    comment: Ubuntu default User
+    password: '*'
+  - name: centos
+    shell: /bin/bash
+    comment: Centos default user
+    password: '*'
+
+timezone: 'Asia/Jakarta'

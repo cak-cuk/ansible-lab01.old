@@ -26,16 +26,11 @@ jobs:
           python-version: '3.x'
 
       - name: Install pip prequities
-        run: pip3 install --no-cache-dir --user --upgrade -r files/requirements/pip3.txt
+        run: pip3 install --no-cache-dir --user --upgrade -r requirements/pip3.yaml
         continue-on-error: true
 
       - name: Install ansible prequities
-        run: ansible-galaxy install -r files/requirements/galaxy.yml
-        continue-on-error: true
-
-      - name: Code lint (Pre-Commit)
-        run: pre-commit run --show-diff-on-failure --color=always --all-files
-        id: lint
+        run: ansible-galaxy install -r requirements/galaxy.yaml
         continue-on-error: true
 
       - name: Code lint (Ansible-lint)
@@ -43,16 +38,21 @@ jobs:
         id: ansible_lint
         continue-on-error: true
 
+      - name: Run molecule
+        id: molecule_converge
+        run: |
+          molecule converge
+
       - uses: actions/github-script@v6
         if: github.event_name == 'pull_request'
         env:
-          LINT: "ansible-lint\n${{ steps.lint.outputs.stdout }}"
+          LINT: "molecule converge\n${{ steps.molecule_converge.outputs.stdout }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const output = `#### Ansible Lint outcome ������\`${{ steps.plant.outcome }}\`
 
-            <details><summary>Show Lint</summary>
+            <details><summary>Show Converge</summary>
 
             \`\`\`\n
             ${process.env.LINT}
@@ -68,8 +68,3 @@ jobs:
               repo: context.repo.repo,
               body: output
             })
-
-      - name: Run molecule
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          molecule converge
